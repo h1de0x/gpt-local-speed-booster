@@ -1,5 +1,10 @@
 # GPT Local Speed Booster
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/h1de0x/gpt-local-speed-booster/main/extension/icons/icon-128.png" alt="GPT Local Speed Booster icon" width="128" height="128">
+</p>
+
+
 A **Firefox-only** extension that reduces lag in very long ChatGPT conversations by locally trimming older messages before the page renders them.
 
 > **Firefox only.**  
