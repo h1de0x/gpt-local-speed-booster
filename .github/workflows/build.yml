@@ -1,0 +1,56 @@
+name: Build Firefox Extension
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build AMO package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint extension
+        run: npm run lint
+
+      - name: Build extension ZIP
+        run: npm run build
+
+      - name: Prepare release artifact
+        run: |
+          mkdir -p release
+          cp dist/*.zip release/gpt-local-speed-booster-${GITHUB_REF_NAME}.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gpt-local-speed-booster
+          path: release/*.zip
+
+      - name: Attach ZIP to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" release/*.zip \
+            --title "GPT Local Speed Booster ${GITHUB_REF_NAME}" \
+            --notes "Automated Firefox extension build." \
+          || gh release upload "${GITHUB_REF_NAME}" release/*.zip --clobber
