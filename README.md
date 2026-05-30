@@ -1,4 +1,5 @@
-# GPT Local Speed Booster
+<h1 align="center">GPT Local Speed Booster</h1>
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/h1de0x/gpt-local-speed-booster/main/extension/icons/icon-128.png" alt="GPT Local Speed Booster icon" width="128" height="128">
