@@ -28,21 +28,6 @@
     showLoadMore: true
   };
 
-  const SCROLL_RESTORE_TIMING = {
-    maxAttempts: 60,
-
-    normalMinHoldMs: 1200,
-    loadMoreMinHoldMs: 2400,
-
-    normalRequiredSuccesses: 2,
-    loadMoreRequiredSuccesses: 5,
-
-    initialAttemptsMs: [120, 300, 700, 1400, 2200, 3200],
-    mutationRetryDelayMs: 160,
-    intervalMs: 300,
-    fallbackMs: 4500
-  };
-
   const extensionApi = typeof browser !== "undefined" ? browser : chrome;
   const usingPromiseApi = typeof browser !== "undefined";
 
@@ -787,17 +772,9 @@
     let attempts = 0;
     let successStreak = 0;
     const startedAt = Date.now();
-    const isLoadMoreRestore = anchor.restoreMode === "load-more";
-
-    const maxAttempts = SCROLL_RESTORE_TIMING.maxAttempts;
-
-    const minHoldMs = isLoadMoreRestore
-      ? SCROLL_RESTORE_TIMING.loadMoreMinHoldMs
-      : SCROLL_RESTORE_TIMING.normalMinHoldMs;
-
-    const requiredSuccesses = isLoadMoreRestore
-      ? SCROLL_RESTORE_TIMING.loadMoreRequiredSuccesses
-      : SCROLL_RESTORE_TIMING.normalRequiredSuccesses;
+    const maxAttempts = 48;
+    const minHoldMs = anchor.restoreMode === "load-more" ? 1800 : 1200;
+    const requiredSuccesses = anchor.restoreMode === "load-more" ? 4 : 2;
 
     const attempt = async () => {
       attempts += 1;
@@ -830,14 +807,17 @@
       }, delay);
     };
 
-    for (const delay of SCROLL_RESTORE_TIMING.initialAttemptsMs) {
-      scheduleAttempt(delay);
-    }
+    scheduleAttempt(80);
+    scheduleAttempt(250);
+    scheduleAttempt(600);
+    scheduleAttempt(1200);
+    scheduleAttempt(1800);
+    scheduleAttempt(2400);
 
     observer = new MutationObserver(() => {
       const count = turnElements().length;
       if (count >= 3) {
-        scheduleAttempt(SCROLL_RESTORE_TIMING.mutationRetryDelayMs);
+        scheduleAttempt(120);
       }
     });
 
@@ -848,13 +828,13 @@
     const interval = setInterval(async () => {
       const done = await attempt();
       if (done) clearInterval(interval);
-    }, SCROLL_RESTORE_TIMING.intervalMs);
+    }, 250);
 
     setTimeout(async () => {
       clearInterval(interval);
       observer?.disconnect();
       await attempt();
-    }, SCROLL_RESTORE_TIMING.fallbackMs);
+    }, 3500);
   }
 
   function tryRestoreScroll(anchor) {
