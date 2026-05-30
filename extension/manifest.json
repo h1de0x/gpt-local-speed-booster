@@ -15,15 +15,7 @@
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png",
-  },
-  "browser_specific_settings": {
-    "gecko": {
-        "id": "gpt-local-speed-booster@addons.mozilla.org",
-        "data_collection_permissions": {
-            "required": ["none"]
-        }
-    }
+    "128": "icons/icon-128.png"
   },
   "content_scripts": [
     {
@@ -65,7 +57,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "gpt-local-speed-booster@addons.mozilla.org",
-      "strict_min_version": "128.0"
+      "strict_min_version": "128.0",
+      "data_collection_permissions": {
+            "required": ["none"]
+      }      
     }
   }
 }
