@@ -1,6 +1,6 @@
 {
   "name": "gpt-local-speed-booster",
-  "version": "1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Firefox-only extension that reduces lag in very long ChatGPT conversations locally.",
   "scripts": {
