@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "GPT Local Speed Booster",
+  "version": "1.0",
+  "description": "Locally reduces very long ChatGPT conversations before rendering to keep the UI responsive.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*"
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png"
+  },  
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": [
+        "src/page/tree-pruner.js",
+        "src/page/page-entry.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": [
+        "src/agent/agent.js"
+      ],
+      "css": [
+        "src/agent/badge.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/ui/popup.html",
+    "default_title": "GPT Local Speed Booster",
+    "default_icon": {
+        "16": "icons/icon-16.png",
+        "32": "icons/icon-32.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png"
+      }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gpt-local-speed-booster@addons.mozilla.org",
+      "strict_min_version": "128.0"
+    }
+  }
+}

@@ -1,0 +1,83 @@
+/*
+ * GPT Local Speed Booster
+ * Copyright (c) 2026 H1de0x
+ * SPDX-License-Identifier: MIT
+ */
+#gpt-local-speed-booster-badge {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2147483647;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(20, 24, 30, 0.82);
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+#gpt-local-speed-booster-badge[data-state="active"] {
+  background: rgba(25, 135, 84, 0.90);
+}
+
+#gpt-local-speed-booster-badge[data-state="off"] {
+  background: rgba(110, 118, 129, 0.82);
+}
+
+#gpt-local-speed-booster-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 10px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+#gpt-local-speed-booster-load-more button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  max-width: min(420px, calc(100vw - 40px));
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(86, 88, 105, 0.85);
+  background: rgba(52, 53, 65, 0.96);
+  color: #ececf1;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+  transition: background 150ms ease, transform 150ms ease, opacity 150ms ease;
+}
+
+#gpt-local-speed-booster-load-more button:hover {
+  background: rgba(64, 65, 79, 0.98);
+  transform: translateY(-1px);
+}
+
+#gpt-local-speed-booster-load-more button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.gpt-local-speed-booster-load-title {
+  display: block;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.gpt-local-speed-booster-load-subtitle {
+  display: block;
+  margin-top: 2px;
+  opacity: 0.72;
+  font-size: 11px;
+  line-height: 1.2;
+}

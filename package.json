@@ -1,0 +1,15 @@
+{
+  "name": "gpt-local-speed-booster",
+  "version": "1.0",
+  "private": true,
+  "description": "Firefox-only extension that reduces lag in very long ChatGPT conversations locally.",
+  "scripts": {
+    "lint": "web-ext lint --source-dir extension",
+    "run": "web-ext run --source-dir extension --target firefox-desktop",
+    "build": "web-ext build --source-dir extension --artifacts-dir dist"
+  },
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  },
+  "license": "MIT"
+}

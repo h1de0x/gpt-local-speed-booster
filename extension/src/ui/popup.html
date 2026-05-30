@@ -1,0 +1,91 @@
+<!--
+  GPT Local Speed Booster
+  Copyright (c) 2026 H1de0x
+  SPDX-License-Identifier: MIT
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GPT Local Speed Booster</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="panel">
+    <header class="hero">
+      <div class="title">GPT Local Speed Booster</div>
+      <div class="subtitle">Local trimming for long ChatGPT conversations</div>
+    </header>
+
+    <section id="unsupported" class="notice hidden">
+      Open this popup on chatgpt.com or chat.openai.com.
+    </section>
+
+    <section class="stats">
+      <div class="card">
+        <div class="label">Rendered</div>
+        <div id="renderedStat" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">Memory estimate</div>
+        <div id="memoryStat" class="value">—</div>
+      </div>
+    </section>
+
+    <section class="settings">
+      <label class="row">
+        <span>
+          <strong>Enable smoother</strong>
+          <small>Trim long conversations before the UI renders them.</small>
+        </span>
+        <input id="enabledInput" type="checkbox">
+      </label>
+
+      <label class="row">
+        <span>
+          <strong>Show badge</strong>
+          <small>Small status pill in the page corner.</small>
+        </span>
+        <input id="badgeInput" type="checkbox">
+      </label>
+
+      <label class="row">
+        <span>
+          <strong>Show Load more</strong>
+          <small>Reload softly and keep more earlier messages.</small>
+        </span>
+        <input id="loadMoreInput" type="checkbox">
+      </label>
+
+      <label class="field">
+        <span>
+          <strong>Messages to keep</strong>
+          <small>30–50 is a good starting point.</small>
+        </span>
+        <input id="limitInput" type="number" min="1" max="200" step="1">
+      </label>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <span>Processing</span>
+        <strong id="timingStat">—</strong>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="saveButton" class="primary">Save settings</button>
+    </section>
+
+    <section class="actions">
+      <button id="resetLoadedButton" class="danger">Reset loaded messages</button>
+    </section>
+
+    <footer>
+      Runs locally. No analytics, licensing, or remote API calls.
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
