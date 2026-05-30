@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GPT Local Speed Booster",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Locally reduces very long ChatGPT conversations before rendering to keep the UI responsive.",
   "permissions": [
     "storage",
@@ -48,19 +48,21 @@
     "default_popup": "src/ui/popup.html",
     "default_title": "GPT Local Speed Booster",
     "default_icon": {
-        "16": "icons/icon-16.png",
-        "32": "icons/icon-32.png",
-        "48": "icons/icon-48.png",
-        "128": "icons/icon-128.png"
-      }
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
   },
   "browser_specific_settings": {
     "gecko": {
       "id": "gpt-local-speed-booster@h1de0x",
       "strict_min_version": "128.0",
       "data_collection_permissions": {
-            "required": ["none"]
-      }      
+        "required": [
+          "none"
+        ]
+      }
     }
   }
 }
