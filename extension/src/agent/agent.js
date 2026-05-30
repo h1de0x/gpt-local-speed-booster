@@ -545,10 +545,17 @@
     const button = wrapper.querySelector("button");
     const increment = getLoadIncrement();
 
-    button.innerHTML = `
-      <span class="gpt-local-speed-booster-load-title">Load ${increment} previous messages</span>
-      <span class="gpt-local-speed-booster-load-subtitle">Reloads softly and restores your position</span>
-    `;
+    button.replaceChildren();
+
+    const title = document.createElement("span");
+    title.className = "gpt-local-speed-booster-load-title";
+    title.textContent = `Load ${increment} previous messages`;
+
+    const subtitle = document.createElement("span");
+    subtitle.className = "gpt-local-speed-booster-load-subtitle";
+    subtitle.textContent = "Reloads softly and restores your position";
+
+    button.append(title, subtitle);
     button.title = `Reload and keep ${increment} more previous messages`;
     button.disabled = false;
   }
