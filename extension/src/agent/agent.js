@@ -8,6 +8,9 @@
 
   const PAGE_SOURCE = "gpt-local-speed-booster:page";
   const AGENT_SOURCE = "gpt-local-speed-booster:agent";
+  const MESSAGE_VERSION = 1;
+  const ROUTE_CHECK_INTERVAL = 500;
+  const ROUTE_CHECK_DEBOUNCE = 100;
 
   const SETTINGS_KEY = "gpt_local_speed_booster_settings";
   const SESSION_KEY = "gpt_local_speed_booster_sessions";
@@ -41,6 +44,9 @@
   let lastStatus = null;
   let restoreAttempted = false;
   let loadMoreRetryTimer = null;
+  let routeCheckTimer = null;
+  let pendingRouteChange = null;
+  let routeChangeSeq = 0;
 
   init();
 
@@ -53,7 +59,7 @@
       extraMessages: currentSession.extraMessages
     });
 
-    window.postMessage({ source: AGENT_SOURCE, type: "status:request" }, "*");
+    window.postMessage({ source: AGENT_SOURCE, type: "status:request", version: MESSAGE_VERSION }, "*");
 
     window.addEventListener("message", handlePageMessage);
     extensionApi.runtime.onMessage.addListener(handleRuntimeMessage);
@@ -63,25 +69,46 @@
   }
 
   function setupRouteWatcher() {
-    setInterval(async () => {
+    if (routeCheckTimer) clearInterval(routeCheckTimer);
+
+    routeCheckTimer = setInterval(() => {
       const nextPageKey = pageKey();
 
       if (nextPageKey === activePageKey) return;
 
-      activePageKey = nextPageKey;
-      restoreAttempted = false;
-      lastStatus = null;
-      currentSession = await loadCurrentSession();
+      // Debounce rapid route changes
+      if (pendingRouteChange) clearTimeout(pendingRouteChange);
 
-      sendConfigToPage({
-        ...currentSettings,
-        extraMessages: currentSession.extraMessages
-      });
+      // Generation token prevents stale async callbacks from applying outdated state
+      const seq = ++routeChangeSeq;
+      const targetPageKey = nextPageKey;
 
-      window.postMessage({ source: AGENT_SOURCE, type: "status:request" }, "*");
-      renderPageControls();
-      setupScrollRestoreWatcher();
-    }, 500);
+      pendingRouteChange = setTimeout(async () => {
+        pendingRouteChange = null;
+
+        activePageKey = targetPageKey;
+        restoreAttempted = false;
+        lastStatus = null;
+
+        const nextSession = await loadCurrentSession();
+
+        // Verify this callback is still current after async operation
+        if (seq !== routeChangeSeq || pageKey() !== targetPageKey) {
+          return;
+        }
+
+        currentSession = nextSession;
+
+        sendConfigToPage({
+          ...currentSettings,
+          extraMessages: currentSession.extraMessages
+        });
+
+        window.postMessage({ source: AGENT_SOURCE, type: "status:request", version: MESSAGE_VERSION }, "*");
+        renderPageControls();
+        setupScrollRestoreWatcher();
+      }, ROUTE_CHECK_DEBOUNCE);
+    }, ROUTE_CHECK_INTERVAL);
   }
 
   function storageGet(defaults) {
@@ -330,6 +357,7 @@
     window.postMessage({
       source: AGENT_SOURCE,
       type: "config:update",
+      version: MESSAGE_VERSION,
       payload: {
         ...settings,
         pageKey: pageKey()
@@ -342,6 +370,15 @@
 
     const message = event.data;
     if (!message || message.source !== PAGE_SOURCE) return;
+
+    // Version check for compatibility
+    if (message.version !== MESSAGE_VERSION) {
+      console.warn("[GPT Local Speed Booster] Incompatible message version", {
+        expected: MESSAGE_VERSION,
+        received: message.version
+      });
+      return;
+    }
 
     if (message.type === "status") {
       lastStatus = message.payload || null;
