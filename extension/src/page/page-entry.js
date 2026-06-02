@@ -11,6 +11,7 @@
 
   const PAGE_SOURCE = "gpt-local-speed-booster:page";
   const AGENT_SOURCE = "gpt-local-speed-booster:agent";
+  const MESSAGE_VERSION = 1;
 
   const EXTRA_MESSAGES_KEY = "gpt_local_speed_booster_extra_messages";
   const NAVIGATING_KEY = "gpt_local_speed_booster_navigating";
@@ -44,6 +45,15 @@
 
     const message = event.data;
     if (!message || message.source !== AGENT_SOURCE) return;
+
+    // Version check for message compatibility
+    if (message.version !== MESSAGE_VERSION) {
+      console.warn("[GPT Local Speed Booster] Incompatible message version", {
+        expected: MESSAGE_VERSION,
+        received: message.version
+      });
+      return;
+    }
 
     if (message.type === "config:update") {
       applyConfig(message.payload || {});
@@ -268,7 +278,10 @@
   function idbRequestToPromise(request) {
     return new Promise((resolve, reject) => {
       request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error || new Error("IndexedDB request failed"));
+      request.onerror = () => {
+        const error = request.error || new Error("IndexedDB request failed");
+        reject(error);
+      };
     });
   }
 
@@ -354,12 +367,22 @@
         .sort((left, right) => Number(right.updatedAt || 0) - Number(left.updatedAt || 0));
 
       let keptForPage = 0;
+      let totalChars = 0;
 
       for (const entry of sorted) {
         const expired = now - Number(entry.updatedAt || 0) > FULL_BODY_CACHE_TTL_MS;
         const samePage = entry.pageKey === pageKey;
 
-        if (expired || (samePage && keptForPage >= MAX_FULL_BODY_CACHE_ENTRIES)) {
+        // Calculate entry size: prefer bodyChars, fall back to actual body length
+        const entryChars = Number(entry.bodyChars || 0) ||
+          (typeof entry.body === "string" ? entry.body.length : 0);
+
+        // Remove if: expired OR exceeded per-page limit OR would exceed total limit
+        const shouldRemove = expired ||
+          (samePage && keptForPage >= MAX_FULL_BODY_CACHE_ENTRIES) ||
+          (totalChars + entryChars > MAX_FULL_BODY_CACHE_CHARS);
+
+        if (shouldRemove) {
           store.delete(entry.key);
           continue;
         }
@@ -367,9 +390,10 @@
         if (samePage) {
           keptForPage += 1;
         }
+        totalChars += entryChars;
       }
-    } catch {
-      // Non-critical.
+    } catch (error) {
+      console.info("[GPT Local Speed Booster] full-body cache cleanup failed", String(error));
     }
   }
 
@@ -643,6 +667,7 @@
     window.postMessage({
       source: PAGE_SOURCE,
       type: "status",
+      version: MESSAGE_VERSION,
       payload: state.lastStatus
     }, "*");
   }
@@ -731,9 +756,8 @@
       const conversation = JSON.parse(text);
       const parseMs = performance.now() - parseStart;
 
-      const storedExtraMessages = typeof readStoredExtraMessages === "function"
-        ? readStoredExtraMessages()
-        : 0;
+      // Use stored extra messages from session/localStorage handoff
+      const storedExtraMessages = readStoredExtraMessages();
 
       // Important for ChatGPT SPA navigation: only current-URL handoff should
       // override the live state. If no handoff exists, keep the same-page
@@ -822,6 +846,7 @@
 
   window.postMessage({
     source: PAGE_SOURCE,
-    type: "ready"
+    type: "ready",
+    version: MESSAGE_VERSION
   }, "*");
 })();
