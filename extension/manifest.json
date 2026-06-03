@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GPT Local Speed Booster",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Locally reduces very long ChatGPT conversations before rendering to keep the UI responsive.",
   "permissions": [
     "storage",
